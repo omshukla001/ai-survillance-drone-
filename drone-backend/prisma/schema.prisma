@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Detection {
+  id          Int      @id @default(autoincrement())
+  latitude    Float    @db.DoublePrecision
+  longitude   Float    @db.DoublePrecision
+  altitude    Float?   @db.DoublePrecision
+  speed       Float?   @db.DoublePrecision
+  heading     Float?   @db.DoublePrecision
+  batteryLevel Int?
+  status      String?
+  peopleCount Int
+  timestamp   DateTime
+  source      String
+  droneId     String   @default("drone_1")
+  createdAt   DateTime @default(now())
+
+  @@index([timestamp])
+  @@index([source])
+  @@index([droneId])
+}
+
+model DroneStatus {
+  id           String   @id @default("drone_1")
+  lastSeen     DateTime
+  status       String   // online, offline, warning
+  batteryLevel Int
+  latitude     Float    @db.DoublePrecision
+  longitude    Float    @db.DoublePrecision
+  altitude     Float    @db.DoublePrecision
+  speed        Float    @db.DoublePrecision
+  heading      Float    @db.DoublePrecision
+  updatedAt    DateTime @default(now()) @updatedAt
+}
