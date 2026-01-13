@@ -4,10 +4,10 @@ import 'leaflet/dist/leaflet.css';
 import '../styles/map.css';
 
 // Import types from Leaflet
-import type { 
-  Map as LeafletMapType, 
-  LatLngTuple, 
-  LayerGroup, 
+import type {
+  Map as LeafletMapType,
+  LatLngTuple,
+  LayerGroup,
   Marker as LeafletMarker,
   DivIcon,
 } from 'leaflet';
@@ -41,10 +41,10 @@ const getSeverityClass = (peopleCount: number): string => {
   return 'high';
 };
 
-const MapWrapper: React.FC<MapWrapperProps> = ({ 
-  detections, 
-  selectedDetection, 
-  onMarkerClick, 
+const MapWrapper: React.FC<MapWrapperProps> = ({
+  detections,
+  selectedDetection,
+  onMarkerClick,
   droneStatuses,
   onNewCoordinate
 }) => {
@@ -54,7 +54,7 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isLocating, setIsLocating] = useState<boolean>(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy: number } | null>(null);
-  
+
   // Refs
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<LeafletMapType | null>(null);
@@ -68,7 +68,7 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
   // Effect 1: Load Leaflet library
   useEffect(() => {
     isMountedRef.current = true;
-    
+
     const loadLeaflet = async () => {
       // Skip if already loaded
       if (L) {
@@ -80,11 +80,11 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
 
       try {
         const leafletModule = await import('leaflet');
-        
+
         if (!isMountedRef.current) return;
 
         L = leafletModule.default || leafletModule;
-        
+
         // Fix for default marker icons in production
         if (L && L.Icon && L.Icon.Default) {
           delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -127,8 +127,8 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
     }
 
     try {
-      // Default coordinates - Gautam Buddha University, Greater Noida
-      const GBU_COORDS: LatLngTuple = [28.4504, 77.5446];
+      // Default coordinates - Gautam Buddha University (Main Circle/Sarovar)
+      const GBU_COORDS: LatLngTuple = [28.4565, 77.5305];
       const DEFAULT_ZOOM = 15;
 
       // Initialize the map
@@ -159,11 +159,11 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
 
       // Create layer group for markers
       const layerGroup = L.layerGroup().addTo(map);
-      
+
       // Store references
       mapInstanceRef.current = map;
       layerGroupRef.current = layerGroup;
-      
+
       if (isMountedRef.current) {
         setIsMapReady(true);
       }
@@ -187,7 +187,7 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
   // Real-time user location tracking
   const handleUserLocation = useCallback(() => {
     console.log('🎯 Starting real-time location tracking...');
-    
+
     if (!navigator.geolocation) {
       const errorMsg = 'Geolocation is not supported by your browser.';
       console.warn('❌ Geolocation not supported');
@@ -215,7 +215,7 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
 
         const { latitude, longitude, accuracy, speed, heading } = position.coords;
         const timestamp = new Date(position.timestamp);
-        
+
         console.log(`📡 Location Update:`, {
           lat: latitude.toFixed(6),
           lng: longitude.toFixed(6),
@@ -231,16 +231,16 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
         if (userMarkerRef.current) {
           const currentPos = userMarkerRef.current.getLatLng();
           const distance = mapInstanceRef.current.distance(currentPos, newLocation);
-          
+
           console.log(`📏 Distance moved: ${distance.toFixed(2)}m`);
-          
+
           const threshold = Math.max(accuracy * 0.5, 10);
-          
+
           if (distance > threshold) {
             console.log(`✅ Significant movement detected`);
             userMarkerRef.current.setLatLng(newLocation);
             setUserLocation(newLocationData);
-            
+
             if (distance > 100) {
               console.log('🚁 Flying to new location');
               mapInstanceRef.current.flyTo(newLocation, 16, {
@@ -251,12 +251,12 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
           } else {
             console.log(`⏭️ Minor movement`);
           }
-          
+
           updateUserMarkerAccuracy(userMarkerRef.current, accuracy);
-          
+
         } else {
           console.log('🎯 First location fix - creating user marker');
-          
+
           mapInstanceRef.current.flyTo(newLocation, 16, {
             duration: 2,
             animate: true
@@ -290,7 +290,7 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
                 </div>
               </div>
             `);
-          
+
           setUserLocation(newLocationData);
         }
 
@@ -307,9 +307,9 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
         if (!isMountedRef.current) return;
 
         console.error('❌ Geolocation error:', error);
-        
+
         let errorMessage = 'Unable to retrieve your location.';
-        
+
         switch (error.code) {
           case error.PERMISSION_DENIED:
             errorMessage = 'Location permission denied. Please enable location services.';
@@ -343,16 +343,16 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
 
   const updateUserMarkerAccuracy = useCallback((marker: LeafletMarker, accuracy: number) => {
     if (!L) return;
-    
+
     const icon = marker.getIcon() as DivIcon;
     const currentHtml = icon.options.html;
-    
+
     if (typeof currentHtml === 'string') {
       const newHtml = currentHtml.replace(
         /width: \d+px; height: \d+px/,
         `width: ${Math.max(accuracy * 2, 20)}px; height: ${Math.max(accuracy * 2, 20)}px`
       );
-      
+
       const newIcon = L.divIcon({
         ...icon.options,
         html: newHtml
@@ -439,7 +439,7 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
       if (newMarkersRef[detectionIdString]) {
         const existingMarker = newMarkersRef[detectionIdString];
         const currentPos = existingMarker.getLatLng();
-        
+
         if (currentPos.lat !== detection.latitude || currentPos.lng !== detection.longitude) {
           existingMarker.setLatLng(position);
         }
@@ -463,7 +463,7 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
         `);
       } else {
         if (!L) return;
-        
+
         try {
           const icon = L.divIcon({
             className: `detection-marker ${severityClass}`,
@@ -542,7 +542,7 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
         }
 
         if (!L) return;
-        
+
         const newIcon = L.divIcon({
           className: `drone-marker ${isActive ? 'active' : 'inactive'}`,
           html: `
@@ -557,7 +557,7 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
         existingMarker.setIcon(newIcon);
       } else {
         if (!L) return;
-        
+
         try {
           const icon = L.divIcon({
             className: `drone-marker ${isActive ? 'active' : 'inactive'}`,
@@ -609,7 +609,7 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
   return (
     <div className="map-wrapper enhanced">
       <div ref={mapRef} className="map-container" />
-      
+
       <button
         onClick={isLocating ? stopLocationTracking : handleUserLocation}
         className={`map-control-button location-button ${isLocating ? 'tracking' : ''}`}

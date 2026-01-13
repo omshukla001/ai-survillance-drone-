@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion'; // Add this import
-import { 
-  Radio, 
-  Users, 
-  MapPin, 
-  Clock, 
-  Activity, 
+import {
+  Radio,
+  Users,
+  MapPin,
+  Clock,
+  Activity,
   AlertTriangle,
   Plane,
   Package,
@@ -42,11 +42,11 @@ const containerVariants: Variants = {
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
-    transition: { 
-      duration: 0.5, 
+    transition: {
+      duration: 0.5,
       ease: "easeOut" as const // Add "as const"
     }
   }
@@ -81,14 +81,14 @@ const glowVariants: Variants = {
 
 function filterByTimeRange(detections: Detection[], timeRange: TimeRange): Detection[] {
   if (timeRange === 'all') return detections;
-  
+
   const now = Date.now();
   const ranges: Record<Exclude<TimeRange, 'all'>, number> = {
     '10min': 10 * 60 * 1000,
     '1hr': 60 * 60 * 1000,
     '24hr': 24 * 60 * 60 * 1000,
   };
-  
+
   const cutoff = now - ranges[timeRange];
   return detections.filter(d => new Date(d.timestamp).getTime() >= cutoff);
 }
@@ -103,38 +103,38 @@ const TIME_RANGES: { value: TimeRange; label: string }[] = [
 // Animated Counter Component
 const AnimatedCounter = ({ value, duration = 1 }: { value: number; duration?: number }) => {
   const [displayValue, setDisplayValue] = useState(0);
-  
+
   useEffect(() => {
     let startValue = displayValue;
     const startTime = Date.now();
     const endTime = startTime + duration * 1000;
-    
+
     const animate = () => {
       const now = Date.now();
       const progress = Math.min((now - startTime) / (endTime - startTime), 1);
       const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
       setDisplayValue(Math.floor(startValue + (value - startValue) * easeProgress));
-      
+
       if (progress < 1) {
         requestAnimationFrame(animate);
       }
     };
-    
+
     requestAnimationFrame(animate);
   }, [value, displayValue, duration]);
-  
+
   return <span>{displayValue}</span>;
 };
 
 // Live Time Component
 const LiveTime = () => {
   const [time, setTime] = useState(new Date());
-  
+
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
-  
+
   return (
     <div className="live-time">
       <Clock size={14} />
@@ -151,14 +151,14 @@ const StatusIndicator = ({ status, label }: { status: 'online' | 'offline' | 'wa
     offline: '#ef4444',
     warning: '#f59e0b'
   };
-  
+
   return (
     <div className="status-indicator">
-      <motion.div 
+      <motion.div
         className="status-dot"
         style={{ backgroundColor: colors[status] }}
-        animate={{ 
-          boxShadow: status === 'online' 
+        animate={{
+          boxShadow: status === 'online'
             ? [`0 0 0 0 ${colors[status]}40`, `0 0 0 8px ${colors[status]}00`]
             : 'none'
         }}
@@ -170,27 +170,27 @@ const StatusIndicator = ({ status, label }: { status: 'online' | 'offline' | 'wa
 };
 
 // Detection Card Component
-const DetectionCard = ({ 
-  detection, 
-  isSelected, 
+const DetectionCard = ({
+  detection,
+  isSelected,
   onClick,
-  index 
-}: { 
-  detection: Detection; 
-  isSelected: boolean; 
+  index
+}: {
+  detection: Detection;
+  isSelected: boolean;
   onClick: () => void;
   index: number;
 }) => {
-  const severityColor = detection.peopleCount <= 3 
-    ? 'var(--success)' 
-    : detection.peopleCount <= 10 
-      ? 'var(--warning)' 
+  const severityColor = detection.peopleCount <= 3
+    ? 'var(--success)'
+    : detection.peopleCount <= 10
+      ? 'var(--warning)'
       : 'var(--danger)';
-      
-  const severityBg = detection.peopleCount <= 3 
-    ? 'var(--success-bg)' 
-    : detection.peopleCount <= 10 
-      ? 'var(--warning-bg)' 
+
+  const severityBg = detection.peopleCount <= 3
+    ? 'var(--success-bg)'
+    : detection.peopleCount <= 10
+      ? 'var(--warning-bg)'
       : 'var(--danger-bg)';
 
   return (
@@ -211,7 +211,7 @@ const DetectionCard = ({
             <Clock size={12} />
             <span>{formatTimestamp(detection.timestamp)}</span>
           </div>
-          <motion.div 
+          <motion.div
             className="people-badge"
             style={{ backgroundColor: severityBg, color: severityColor }}
             whileHover={{ scale: 1.1 }}
@@ -235,15 +235,15 @@ const DetectionCard = ({
 };
 
 // Drone Status Card Component - FIXED: Use correct DroneStatusData properties
-const DroneStatusCard = ({ 
-  name, 
-  type, 
+const DroneStatusCard = ({
+  name,
+  type,
   status,
   batteryLevel,
-  altitude, 
+  altitude,
   speed,
-  hasCamera = false 
-}: { 
+  hasCamera = false
+}: {
   name: string;
   type: 'scout' | 'delivery';
   status: 'online' | 'offline' | 'warning';
@@ -254,9 +254,9 @@ const DroneStatusCard = ({
 }) => {
   const Icon = type === 'scout' ? Eye : Package;
   const isOnline = status !== 'offline';
-  
+
   return (
-    <motion.div 
+    <motion.div
       className={`drone-status-card ${type}`}
       variants={itemVariants}
       whileHover={{ scale: 1.02 }}
@@ -265,7 +265,7 @@ const DroneStatusCard = ({
         <div className="drone-icon-wrapper">
           <Icon size={20} />
           {hasCamera && (
-            <motion.div 
+            <motion.div
               className="camera-indicator"
               animate={{ opacity: [1, 0.5, 1] }}
               transition={{ duration: 1.5, repeat: Infinity }}
@@ -284,7 +284,7 @@ const DroneStatusCard = ({
           <span>{isOnline ? 'Online' : 'Offline'}</span>
         </div>
       </div>
-      
+
       <div className="drone-telemetry">
         <div className="telemetry-item">
           <div className="telemetry-label">
@@ -293,11 +293,11 @@ const DroneStatusCard = ({
           </div>
           <div className="telemetry-value">
             <div className="battery-bar">
-              <motion.div 
+              <motion.div
                 className="battery-fill"
                 initial={{ width: 0 }}
                 animate={{ width: `${batteryLevel}%` }}
-                style={{ 
+                style={{
                   backgroundColor: batteryLevel > 50 ? 'var(--success)' : batteryLevel > 20 ? 'var(--warning)' : 'var(--danger)'
                 }}
               />
@@ -325,20 +325,20 @@ const DroneStatusCard = ({
 };
 
 // Stat Card Component
-const StatCard = ({ 
-  icon: Icon, 
-  label, 
-  value, 
+const StatCard = ({
+  icon: Icon,
+  label,
+  value,
   color,
-  suffix = '' 
-}: { 
-  icon: any; 
-  label: string; 
-  value: number; 
+  suffix = ''
+}: {
+  icon: any;
+  label: string;
+  value: number;
   color: string;
   suffix?: string;
 }) => (
-  <motion.div 
+  <motion.div
     className="stat-card"
     variants={itemVariants}
     whileHover={{ scale: 1.05, y: -5 }}
@@ -366,6 +366,7 @@ const Index = () => {
     minPeopleCount: 0,
     timeRange: 'all',
   });
+  const [scoutActive, setScoutActive] = useState(false);
 
   const handleClearDetections = async () => {
     const ok = await clearDetections();
@@ -412,57 +413,59 @@ const Index = () => {
 
   const stats = useMemo(() => {
     const totalPeople = filteredDetections.reduce((sum, d) => sum + d.peopleCount, 0);
-    const maxPeople = filteredDetections.length > 0 
+    const maxPeople = filteredDetections.length > 0
       ? Math.max(...filteredDetections.map(d => d.peopleCount))
       : 0;
-    // FIXED: Use correct property name
     const onlineDrones = Object.values(droneStatuses).filter(d => d.status !== 'offline').length;
-    return { 
-      totalDetections: filteredDetections.length, 
+    return {
+      totalDetections: filteredDetections.length,
       totalPeople,
-      maxPeople, 
-      onlineDrones 
+      maxPeople,
+      onlineDrones
     };
   }, [filteredDetections, droneStatuses]);
 
-  // FIXED: Use correct DroneStatusData properties
+  const handleStreamStart = () => {
+    setScoutActive(true);
+  };
+
   const scoutDrone = {
     name: 'Scout Drone',
     type: 'scout' as const,
-    status: droneStatuses['drone_1']?.status ?? 'online' as const,
-    batteryLevel: droneStatuses['drone_1']?.batteryLevel ?? 85,
-    altitude: droneStatuses['drone_1']?.lastLocation?.altitude ?? 120,
-    speed: droneStatuses['drone_1']?.speed ?? 25,
-    hasCamera: true
+    status: scoutActive ? (droneStatuses['drone_1']?.status ?? 'online') : 'offline' as const,
+    batteryLevel: scoutActive ? (droneStatuses['drone_1']?.batteryLevel ?? 85) : 0,
+    altitude: scoutActive ? (droneStatuses['drone_1']?.lastLocation?.altitude ?? 120) : 0,
+    speed: scoutActive ? (droneStatuses['drone_1']?.speed ?? 25) : 0,
+    hasCamera: scoutActive
   };
 
   const deliveryDrone = {
     name: 'Delivery Drone',
     type: 'delivery' as const,
-    status: droneStatuses['drone_2']?.status ?? 'online' as const,
-    batteryLevel: droneStatuses['drone_2']?.batteryLevel ?? 72,
-    altitude: droneStatuses['drone_2']?.lastLocation?.altitude ?? 80,
-    speed: droneStatuses['drone_2']?.speed ?? 18
+    status: scoutActive ? (droneStatuses['drone_2']?.status ?? 'online') : 'offline' as const,
+    batteryLevel: scoutActive ? (droneStatuses['drone_2']?.batteryLevel ?? 0) : 0,
+    altitude: scoutActive ? (droneStatuses['drone_2']?.lastLocation?.altitude ?? 0) : 0,
+    speed: scoutActive ? (droneStatuses['drone_2']?.speed ?? 0) : 0
   };
 
   return (
-    <div className="skyrelief-container">
+    <div className="skyrelief-container" >
       {/* Animated Background */}
-      <div className="background-effects">
+      < div className="background-effects" >
         <div className="gradient-orb orb-1" />
         <div className="gradient-orb orb-2" />
         <div className="grid-overlay" />
-      </div>
+      </div >
 
       {/* Header */}
-      <motion.header 
+      < motion.header
         className="main-header"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
         <div className="header-left">
-          <motion.div 
+          <motion.div
             className="logo"
             whileHover={{ scale: 1.05 }}
           >
@@ -477,7 +480,7 @@ const Index = () => {
         </div>
 
         <div className="header-center">
-          <motion.div 
+          <motion.div
             className="live-badge"
             animate={isLive ? { opacity: [1, 0.7, 1] } : {}}
             transition={{ duration: 1.5, repeat: Infinity }}
@@ -496,17 +499,17 @@ const Index = () => {
           </div>
           <LiveTime />
         </div>
-      </motion.header>
+      </motion.header >
 
       {/* Main Content */}
-      <motion.main 
+      < motion.main
         className="main-content"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         {/* Left Panel - Detections */}
-        <motion.aside className="detections-panel" variants={itemVariants}>
+        < motion.aside className="detections-panel" variants={itemVariants} >
           <div className="panel-header">
             <div className="panel-title">
               <Target size={18} />
@@ -514,7 +517,7 @@ const Index = () => {
               <span className="detection-count">{sortedDetections.length}</span>
             </div>
             <div className="panel-actions">
-              <motion.button 
+              <motion.button
                 className="icon-button"
                 onClick={() => setShowFilters(!showFilters)}
                 whileHover={{ scale: 1.1 }}
@@ -522,7 +525,7 @@ const Index = () => {
               >
                 <Filter size={16} />
               </motion.button>
-              <motion.button 
+              <motion.button
                 className="icon-button danger"
                 onClick={handleClearDetections}
                 disabled={detections.length === 0}
@@ -537,7 +540,7 @@ const Index = () => {
           {/* Filters */}
           <AnimatePresence>
             {showFilters && (
-              <motion.div 
+              <motion.div
                 className="filters-section"
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
@@ -546,10 +549,10 @@ const Index = () => {
               >
                 <div className="filter-group">
                   <label>Min. People: <span>{filters.minPeopleCount}+</span></label>
-                  <input 
-                    type="range" 
-                    min="0" 
-                    max="50" 
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
                     value={filters.minPeopleCount}
                     onChange={(e) => setFilters({ ...filters, minPeopleCount: parseInt(e.target.value) })}
                   />
@@ -558,7 +561,7 @@ const Index = () => {
                   <label>Time Range</label>
                   <div className="time-range-buttons">
                     {TIME_RANGES.map(({ value, label }) => (
-                      <button 
+                      <button
                         key={value}
                         className={filters.timeRange === value ? 'active' : ''}
                         onClick={() => setFilters({ ...filters, timeRange: value })}
@@ -585,9 +588,9 @@ const Index = () => {
                 />
               ))}
             </AnimatePresence>
-            
+
             {sortedDetections.length === 0 && (
-              <motion.div 
+              <motion.div
                 className="empty-state"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -598,51 +601,51 @@ const Index = () => {
               </motion.div>
             )}
           </div>
-        </motion.aside>
+        </motion.aside >
 
         {/* Center - Map */}
-        <motion.section className="map-section" variants={itemVariants}>
+        < motion.section className="map-section" variants={itemVariants} >
           <div className="map-container">
-            <MapWrapper 
-              detections={filteredDetections} 
-              selectedDetection={selectedDetection} 
-              onMarkerClick={setSelectedDetection} 
-              droneStatuses={droneStatuses} 
+            <MapWrapper
+              detections={filteredDetections}
+              selectedDetection={selectedDetection}
+              onMarkerClick={setSelectedDetection}
+              droneStatuses={droneStatuses}
             />
-            
+
             {/* Map Overlay Stats */}
             <div className="map-overlay-stats">
-              <StatCard 
-                icon={Target} 
-                label="Detections" 
-                value={stats.totalDetections} 
-                color="#06b6d4" 
+              <StatCard
+                icon={Target}
+                label="Detections"
+                value={stats.totalDetections}
+                color="#06b6d4"
               />
-              <StatCard 
-                icon={Users} 
-                label="People Found" 
-                value={stats.totalPeople} 
-                color="#8b5cf6" 
+              <StatCard
+                icon={Users}
+                label="People Found"
+                value={stats.totalPeople}
+                color="#8b5cf6"
               />
-              <StatCard 
-                icon={Plane} 
-                label="Drones Online" 
-                value={stats.onlineDrones} 
-                color="#10b981" 
+              <StatCard
+                icon={Plane}
+                label="Drones Online"
+                value={stats.onlineDrones}
+                color="#10b981"
               />
-              <StatCard 
-                icon={AlertTriangle} 
-                label="Max Group" 
-                value={stats.maxPeople} 
+              <StatCard
+                icon={AlertTriangle}
+                label="Max Group"
+                value={stats.maxPeople}
                 color="#f59e0b"
-                suffix=" ppl" 
+                suffix=" ppl"
               />
             </div>
 
             {/* Selected Detection Info */}
             <AnimatePresence>
               {selectedDetection && (
-                <motion.div 
+                <motion.div
                   className="selected-detection-overlay"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -670,14 +673,14 @@ const Index = () => {
               )}
             </AnimatePresence>
           </div>
-        </motion.section>
+        </motion.section >
 
         {/* Right Panel - Drone Status & Video */}
-        <motion.aside className="drones-panel" variants={itemVariants}>
+        < motion.aside className="drones-panel" variants={itemVariants} >
           {/* Scout Drone with Video */}
-          <div className="drone-section scout">
+          < div className="drone-section scout" >
             <DroneStatusCard {...scoutDrone} />
-            <motion.div 
+            <motion.div
               className="video-feed-wrapper"
               variants={glowVariants}
               animate="glow"
@@ -687,46 +690,33 @@ const Index = () => {
                   <Eye size={14} />
                   <span>Live Camera Feed</span>
                 </div>
-                <motion.div 
-                  className="recording-badge"
-                  animate={{ opacity: [1, 0.5, 1] }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                >
-                  <div className="rec-dot" />
-                  <span>REC</span>
-                </motion.div>
+                {scoutActive && (
+                  <motion.div
+                    className="recording-badge"
+                    animate={{ opacity: [1, 0.5, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                  >
+                    <div className="rec-dot" />
+                    <span>REC</span>
+                  </motion.div>
+                )}
               </div>
               <div className="video-container">
-                <VideoFeed droneId="drone_1" />
+                <VideoFeed droneId="drone_1" onStreamStart={handleStreamStart} />
               </div>
             </motion.div>
-          </div>
+          </div >
 
           {/* Delivery Drone */}
-          <div className="drone-section delivery">
+          < div className="drone-section delivery" >
             <DroneStatusCard {...deliveryDrone} />
-            <div className="delivery-status">
-              <div className="delivery-info">
-                <Package size={24} />
-                <div>
-                  <span className="status-label">Payload Status</span>
-                  <span className="status-value">Ready for Deployment</span>
-                </div>
-              </div>
-              <motion.button 
-                className="deploy-button"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Deploy Relief
-              </motion.button>
-            </div>
-          </div>
-        </motion.aside>
-      </motion.main>
+            {/* Payload UI removed as requested */}
+          </div >
+        </motion.aside >
+      </motion.main >
 
       {/* Footer */}
-      <motion.footer 
+      < motion.footer
         className="main-footer"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -743,8 +733,8 @@ const Index = () => {
         <div className="footer-right">
           <span>Team ID: N252991</span>
         </div>
-      </motion.footer>
-    </div>
+      </motion.footer >
+    </div >
   );
 };
 

@@ -38,7 +38,7 @@ const mockDroneStatus: Record<string, DroneStatusData> = {
   drone_1: {
     id: 'drone_1',
     lastSeen: new Date().toISOString(),
-    status: 'online',
+    status: 'offline', // Default to offline as requested
     batteryLevel: Math.floor(Math.random() * 30) + 70, // 70-100%
     lastLocation: {
       latitude: 12.9716 + (Math.random() - 0.5) * 0.1,
@@ -51,7 +51,7 @@ const mockDroneStatus: Record<string, DroneStatusData> = {
   drone_2: {
     id: 'drone_2',
     lastSeen: new Date().toISOString(),
-    status: 'online',
+    status: 'offline', // Default to offline as requested
     batteryLevel: Math.floor(Math.random() * 50) + 50, // 50-100%
     lastLocation: {
       latitude: 12.9352 + (Math.random() - 0.5) * 0.1,
@@ -110,21 +110,21 @@ export function connectToStream(onDetection: (detection: Detection) => void): We
   try {
     const wsUrl = 'ws://localhost:8765';
     console.log(`[WebSocket] Connecting to ${wsUrl}...`);
-    
+
     const ws = new WebSocket(wsUrl);
-    
+
     ws.onopen = () => {
       console.log('[WebSocket] Connected successfully');
     };
-    
+
     ws.onmessage = (event) => {
       try {
         console.log('[WebSocket] Message received:', event.data);
         const message = JSON.parse(event.data);
-        
+
         if (message.type === 'coordinates' && message.data) {
           console.log('[WebSocket] Processing coordinates:', message.data);
-          
+
           // Transform the data to match the Detection type
           const detection: Detection = {
             id: Date.now(),
@@ -135,7 +135,7 @@ export function connectToStream(onDetection: (detection: Detection) => void): We
             source: 'lora',
             createdAt: new Date().toISOString(),
           };
-          
+
           console.log('[WebSocket] Emitting detection:', detection);
           onDetection(detection);
         } else {
@@ -145,15 +145,15 @@ export function connectToStream(onDetection: (detection: Detection) => void): We
         console.error('[WebSocket] Error processing message:', error, 'Raw data:', event.data);
       }
     };
-    
+
     ws.onerror = (error) => {
       console.error('[WebSocket] Error:', error);
     };
-    
+
     ws.onclose = (event) => {
       console.log(`[WebSocket] Connection closed. Code: ${event.code}, Reason: ${event.reason}`);
     };
-    
+
     return ws;
   } catch (error) {
     console.error('Error connecting to WebSocket:', error);
