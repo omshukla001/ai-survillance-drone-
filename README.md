@@ -1,5 +1,9 @@
 # AI Surveillance Drone 🛸
 
+<p align="center">
+  <img src="./DRONE/WhatsApp%20Image%202026-06-27%20at%2010.57.52%20AM.jpeg" alt="Drone Image" width="600"/>
+</p>
+
 An end-to-end drone surveillance system featuring a real-time web frontend and an API backend, designed to track drone detections and stream data. 
 
 ## 📁 Project Structure
