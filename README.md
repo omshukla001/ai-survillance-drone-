@@ -39,10 +39,22 @@ ai-survillance-drone-
 
 ## 🛠️ Tech Stack
 
-* **Frontend:** React, TypeScript, Leaflet (react-leaflet), Framer Motion, Lucide React
-* **Backend:** Python (FastAPI, WebSockets, PySerial) & Node.js (Prisma ORM)
-* **Hardware Communication:** LoRa Modules via Serial (PySerial)
-* **Database:** PostgreSQL (managed via Prisma)
+* **Programming & AI:** Python, OpenCV, YOLOv8 (Computer Vision), NumPy
+* **Drone & Embedded Systems:** Raspberry Pi 4, Pixhawk 2.4.8 / APM 2.5, Servo Motor Control
+* **Flight Control & Communication:** MAVLink, ArduPilot, Mission Planner, Telemetry, LoRa Communication
+* **Sensors & Hardware:** GPS Module, Camera Module, LiPo Battery Management, ESC + BLDC Motors
+* **Core Concepts:** Autonomous Navigation, Human Detection, Real-Time Surveillance, Payload Delivery System, Disaster Response Automation
+
+## 📄 Resume Project Entry (Recommended)
+
+**Autonomous Dual Drone System for Disaster Management**
+
+**Tech Stack:** Python, OpenCV, YOLOv8, Raspberry Pi, Pixhawk/APM, ArduPilot, MAVLink, Mission Planner, GPS, LoRa
+
+- Built an AI-powered autonomous dual-drone system for disaster management with separate scout and delivery drones.
+- Implemented real-time AI-based human detection using an onboard camera and YOLOv8 for victim identification.
+- Integrated GPS and telemetry to transmit real-time victim coordinates to the Ground Control Station via LoRa and MAVLink.
+- Developed a servo-based payload delivery mechanism for automated food and medical supply drops.
 
 ## 🔧 Getting Started
 
